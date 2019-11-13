@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Lights Off</title>
+<style>
+ .block{
+  background-color: #aaa;
+  border: solid 1px #222;
+  display: inline-block;
+  width: 50px;
+  height: 50px;
+  cursor: pointer;
+  box-sizing: border-box;
+ }
+ .block.switch{
+  background-color: green;
+ }
+</style>
+</head>
+<body>
+  <div id="container"></div>
+  <script>
+  let Size = 2;
+  let array=[];
+  function Block(r, c){
+   let light = false;
+   const element = document.createElement('div');
+   element.className="block";
+   container.appendChild(element);
+   
+   element.onclick=()=>{
+     if (!light) return;
+     this.toggleLight();
+      if (array[r+1]) array[r+1][c].toggleLight();
+      if (array[r-1]) array[r-1][c].toggleLight();
+      if(array[r][c-1]) array[r][c-1].toggleLight();
+      if (array[r][c+1]) array[r][c+1].toggleLight();
+      checkLights(array);
+   }; 
+   this.isOn=()=>{
+    return light;
+   };
+   this.toggleLight=()=>{
+   light = !light;
+   element.className = light ? 'block switch': 'block';
+   };
+  }
+  const checkLights=(arr, i=0, j=0)=>{
+    if (j=== Size){
+      Size=+prompt("You won! Play again with different size? 0 to stop playing");
+      if (Size) {
+        container.innerHTML = '';
+        array = [];
+        startGame();
+      }
+      return true;
+    }
+    if (i === Size){
+      return checkLights(arr, 0, j+1);
+    }
+    if(array[i][j].isOn()) return false;
+    return checkLights(arr, i+1, j);
+  };
+  const build=(arr, i=0, j=0, temp=[])=>{ 
+  if (i === Size) { return arr};
+  if (j === Size) { arr.push(temp)
+    return build(arr, i+1, j=0, temp=[]);
+  }
+  temp.push(new Block(i,j));
+  return build(arr, i, j+1, temp);
+  }
+  const generateRandom=()=>{
+    return {
+      x: Math.floor(Math.random()*Size),
+      y: Math.floor(Math.random()*Size),
+    };
+  };
+  const startGame =()=>{
+  container.style.width = `${Size*50}px`
+  build(array);
+  const random = generateRandom();
+  array[random.x][random.y].toggleLight();
+  }
+  startGame();
+  </script>
+ </body>
+</html>
